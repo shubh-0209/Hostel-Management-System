@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    /* Premium Academic Palette */
+    --background: 210 40% 98%; /* #f8fafc Very light slate */
+    --foreground: 222 47% 11%; /* #0f172a Dark navy/slate */
+
+    --card: 0 0% 100%; /* #ffffff White */
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 216 92% 29%; /* #063B8C Deep Navy */
+    --primary-light: 216 72% 42%; /* #1E5BB8 Royal Blue */
+    --primary-foreground: 0 0% 100%; /* White */
+
+    --secondary: 214 32% 91%; /* #e2e8f0 Light slate */
+    --secondary-foreground: 222 47% 11%;
+
+    --muted: 214 32% 91%;
+    --muted-foreground: 215 16% 47%; /* #64748b Muted slate */
+
+    --accent: 214 32% 91%;
+    --accent-foreground: 222 47% 11%;
+
+    --destructive: 0 84% 60%; /* #ef4444 Muted red */
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 175 84% 32%; /* #0d9488 Teal/Green */
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 44%; /* #d97706 Amber */
+    --warning-foreground: 0 0% 100%;
+
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 216 92% 29%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* We are focusing on light mode premium UI for this phase, 
+       but setting sensible defaults just in case */
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+    --card: 222 47% 11%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 216 72% 42%;
+    --primary-light: 216 92% 29%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 217 32% 17%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 32% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 32% 17%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+    --success: 175 84% 32%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 45%;
+    --warning-foreground: 0 0% 100%;
+    --border: 217 32% 17%;
+    --input: 217 32% 17%;
+    --ring: 210 40% 98%;
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Typography Hierarchy Utilities - Removed @apply for Tailwind v4 compatibility */
+}

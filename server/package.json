@@ -1,0 +1,26 @@
+{
+  "name": "hms-backend",
+  "version": "1.0.0",
+  "description": "HMS Express Backend",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "helmet": "^7.1.0",
+    "morgan": "^1.10.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "supertest": "^6.3.4",
+    "vitest": "^1.4.0"
+  }
+}
