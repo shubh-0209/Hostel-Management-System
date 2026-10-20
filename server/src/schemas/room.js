@@ -43,3 +43,10 @@ export const deleteRoomSchema = z.object({
   params: paramIdSchema,
   query: z.object({}),
 });
+
+export const getRoomSchema = z.object({
+  body: z.object({}),
+  params: paramIdSchema,
+  query: z.object({}),
+});
+

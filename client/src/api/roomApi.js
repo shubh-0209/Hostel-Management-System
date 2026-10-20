@@ -1,6 +1,7 @@
 import apiClient from './apiClient';
 
 export const roomApi = {
+  getById: (id) => apiClient.get(`/rooms/${id}`),
   getByFloorId: (floorId) => apiClient.get(`/floors/${floorId}/rooms`),
   create: (data) => apiClient.post(`/floors/${data.floor_id}/rooms`, data),
   update: (id, data) => apiClient.patch(`/rooms/${id}`, data),

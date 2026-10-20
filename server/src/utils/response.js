@@ -2,10 +2,8 @@ export const sendSuccess = (res, statusCode, message, data = null) => {
   const response = {
     success: true,
     message,
+    data: data !== undefined ? data : null,
   };
-  if (data !== null) {
-    response.data = data;
-  }
   return res.status(statusCode).json(response);
 };
 

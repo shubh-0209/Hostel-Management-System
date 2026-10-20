@@ -19,6 +19,35 @@ export const getRooms = async (req, res, next) => {
   }
 };
 
+export const getRoom = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { data: room, error } = await supabase
+      .from('rooms')
+      .select(`
+        id, room_number, type, is_ac, capacity, status,
+        floor:floors (
+          id, floor_number,
+          hostel:hostels (
+            id, name, code
+          )
+        )
+      `)
+      .eq('id', id)
+      .single();
+
+    if (error || !room) {
+      if (error) console.error('getRoom DB error:', error);
+      throw new ApiError(404, 'Room not found: ' + (error?.message || 'Not found'));
+    }
+
+    return sendSuccess(res, 200, 'Room retrieved successfully', room);
+  } catch (error) {
+    next(error);
+  }
+};
+
+
 export const createRoom = async (req, res, next) => {
   try {
     const { floorId } = req.params;

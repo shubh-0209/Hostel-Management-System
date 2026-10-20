@@ -15,6 +15,9 @@ import Login from './pages/Login';
 import Hostels from './pages/Hostels';
 import HostelDetail from './pages/HostelDetail';
 import WardenDashboard from './pages/WardenDashboard';
+import WardenOutings from './pages/warden/Outings';
+import WardenMaintenance from './pages/warden/Maintenance';
+import WardenOccupancyReports from './pages/warden/OccupancyReports';
 import Placeholder from './pages/Placeholder';
 
 import StudentDashboard from './pages/student/Dashboard';
@@ -25,6 +28,7 @@ import StudentAllocation from './pages/student/Allocation';
 import StudentProfile from './pages/student/Profile';
 import StudentOutings from './pages/student/Outings';
 import StudentNotifications from './pages/student/Notifications';
+import StudentMaintenance from './pages/student/Maintenance';
 
 function App() {
   return (
@@ -48,8 +52,9 @@ function App() {
                   <Route path="hostels" element={<Hostels />} />
                   <Route path="hostels/:hostelId" element={<HostelDetail />} />
                   <Route path="students" element={<Placeholder title="Student Directory" />} />
-                  <Route path="outings" element={<Placeholder title="Outing Requests" />} />
-                  <Route path="occupancy" element={<Placeholder title="Occupancy Overview" />} />
+                  <Route path="outings" element={<WardenOutings />} />
+                  <Route path="maintenance" element={<WardenMaintenance />} />
+                  <Route path="occupancy" element={<WardenOccupancyReports />} />
                   <Route path="audit" element={<Placeholder title="Audit Logs" />} />
                 </Route>
               </Route>
@@ -65,6 +70,7 @@ function App() {
                   <Route path="allocation" element={<StudentAllocation />} />
                   <Route path="profile" element={<StudentProfile />} />
                   <Route path="outings" element={<StudentOutings />} />
+                  <Route path="maintenance" element={<StudentMaintenance />} />
                   <Route path="notifications" element={<StudentNotifications />} />
                 </Route>
               </Route>

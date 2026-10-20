@@ -6,5 +6,8 @@ export const allocationService = {
   },
   allocateBed: async (bedId) => {
     return apiClient.post('/student/allocation', { bed_id: bedId });
+  },
+  vacateBed: async () => {
+    return apiClient.post('/student/allocation/vacate');
   }
 };

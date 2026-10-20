@@ -15,15 +15,10 @@ import {
 
 const wardenNavigation = [
   { name: 'Dashboard', href: '/warden/dashboard', icon: LayoutDashboard },
-  { name: 'Students', href: '/warden/students', icon: Users },
   { name: 'Hostels', href: '/warden/hostels', icon: Building2 },
-  { name: 'Rooms', href: '/warden/rooms', icon: DoorOpen },
-  { name: 'Allocations', href: '/warden/occupancy', icon: BedDouble },
+  { name: 'Allocations & Reports', href: '/warden/occupancy', icon: BarChart3 },
   { name: 'Outings', href: '/warden/outings', icon: CalendarClock },
-  { name: 'Notifications', href: '/warden/notifications', icon: BellRing },
-  { name: 'Reports', href: '/warden/reports', icon: BarChart3 },
-  { name: 'Audit Logs', href: '/warden/audit', icon: History },
-  { name: 'Settings', href: '/warden/settings', icon: Settings },
+  { name: 'Maintenance', href: '/warden/maintenance', icon: Settings },
 ];
 
 export default function WardenLayout() {

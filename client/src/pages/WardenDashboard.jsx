@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { hostelApi } from '../api/hostelApi';
+import { wardenApi } from '../api/wardenApi';
 import { StatCard } from '../components/shared/StatCard';
 import { Users, Bed, BedDouble, AlertCircle, TrendingUp } from 'lucide-react';
 import { OccupancyChart } from '../components/dashboard/OccupancyChart';
@@ -21,27 +22,22 @@ export default function WardenDashboard() {
   useEffect(() => {
     async function fetchData() {
       try {
+        setLoading(true);
+        // Fetch dashboard statistics
+        const statsRes = await wardenApi.getDashboardStats();
+        setStats(statsRes.data);
+        
+        // Fetch Top 2 Hostels for overview
         const hostelsRes = await hostelApi.getAll();
+        setHostels(hostelsRes.data.slice(0, 2) || []);
         
-        const allHostels = hostelsRes.data;
-        const tHostels = allHostels.length;
-        const tBeds = allHostels.reduce((sum, h) => sum + (h.bed_count || 0), 0);
-        const oBeds = allHostels.reduce((sum, h) => sum + (h.occupied_beds || 0), 0);
-        const aBeds = tBeds - oBeds;
+        // Fetch Pending Outings for quick action
+        const outingsRes = await wardenApi.getOutings('pending');
+        // Slice top 3 for dashboard
+        setOutings(outingsRes.data.slice(0, 3) || []);
         
-        setStats({
-          total_hostels: tHostels,
-          total_beds: tBeds,
-          occupied_beds: oBeds,
-          available_beds: aBeds,
-          occupancy_rate: tBeds ? Math.round((oBeds / tBeds) * 100) : 0,
-          pending_outings: 0, // Coming soon
-          total_students: 0 // Coming soon
-        });
-        
-        setActivities([]); // Coming soon
-        setHostels(allHostels.slice(0, 2)); // Top 2 hostels for overview
-        setOutings([]); // Coming soon
+        // Activity API is pending
+        setActivities([]); 
       } catch (err) {
         console.error("Failed to load dashboard data", err);
       } finally {
@@ -86,30 +82,30 @@ export default function WardenDashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
         <StatCard 
           title="Total Students" 
-          value="--" 
+          value={stats?.total_students || 0} 
           icon={<Users className="w-5 h-5 text-primary" />} 
-          trend="Coming soon"
+          trend="Enrolled"
           trendPositive={true}
         />
         <StatCard 
           title="Occupancy Rate" 
-          value={`${stats?.occupancy_rate}%`} 
+          value={`${stats?.occupancy_rate || 0}%`} 
           icon={<TrendingUp className="w-5 h-5 text-emerald-600" />} 
-          trend="Healthy"
+          trend={`${stats?.occupied_beds || 0} beds allocated`}
           trendPositive={true}
         />
         <StatCard 
           title="Available Beds" 
-          value={stats?.available_beds} 
+          value={stats?.available_beds || 0} 
           icon={<Bed className="w-5 h-5 text-amber-600" />} 
-          trend="Action required"
-          trendPositive={false}
+          trend={`Out of ${stats?.total_beds || 0} total`}
+          trendPositive={true}
         />
         <StatCard 
-          title="Pending Outings" 
-          value="--" 
+          title="Pending Operations" 
+          value={(stats?.pending_outings || 0) + (stats?.pending_maintenance || 0)} 
           icon={<AlertCircle className="w-5 h-5 text-red-600" />} 
-          trend="Coming soon"
+          trend={`${stats?.pending_outings || 0} outings, ${stats?.pending_maintenance || 0} tasks`}
           trendPositive={false}
         />
       </div>

@@ -2,13 +2,10 @@ import { z } from 'zod';
 
 export const updateProfileSchema = z.object({
   body: z.object({
-    name: z.string().min(2, "Name must be at least 2 characters").max(100).optional(),
-    jntu_number: z.string().min(10, "Invalid JNTU number").max(20).optional(),
-    department: z.string().min(2).max(100).optional(),
-    academic_year: z.number().int().min(1).max(4).optional(),
-    phone: z.string().min(10, "Invalid phone number").max(15).optional(),
-    parent_phone: z.string().min(10, "Invalid parent phone number").max(15).optional(),
-    address: z.string().max(500).optional()
+    phone: z.string().regex(/^[0-9+\- ]{10,15}$/, "Invalid phone number (10-15 digits)").optional(),
+    parent_email: z.string().email("Invalid parent email address").optional()
+  }).refine(data => data.phone !== undefined || data.parent_email !== undefined, {
+    message: "At least one field (phone or parent_email) must be provided"
   })
 });
 
@@ -19,16 +16,44 @@ export const allocateBedSchema = z.object({
 });
 
 export const createOutingSchema = z.object({
-  body: z.object({
-    out_datetime: z.string().datetime("Invalid out_datetime"),
-    in_datetime: z.string().datetime("Invalid in_datetime"),
-    reason: z.string().min(5, "Reason is too short").max(500)
-  }).refine((data) => {
-    const outDate = new Date(data.out_datetime);
-    const inDate = new Date(data.in_datetime);
-    return inDate > outDate;
+  body: z.discriminatedUnion("application_type", [
+    z.object({
+      application_type: z.literal("out_pass"),
+      out_datetime: z.string().datetime("Invalid out_datetime"),
+      in_datetime: z.string().datetime("Invalid in_datetime"),
+      reason: z.string().min(5, "Reason is too short").max(500),
+      destination: z.string().max(255).optional(),
+      contact_info: z.string().max(255).optional()
+    }),
+    z.object({
+      application_type: z.literal("leave"),
+      leave_from_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Must be YYYY-MM-DD"),
+      leave_to_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Must be YYYY-MM-DD"),
+      leave_type: z.enum(['home_leave', 'medical_leave', 'personal_leave', 'academic_leave', 'other']),
+      reason: z.string().min(5, "Reason is too short").max(500),
+      destination: z.string().max(255).optional(),
+      contact_info: z.string().max(255).optional()
+    })
+  ]).refine((data) => {
+    if (data.application_type === 'out_pass') {
+      const outDate = new Date(data.out_datetime);
+      const inDate = new Date(data.in_datetime);
+      return inDate > outDate;
+    } else {
+      const fromDate = new Date(data.leave_from_date);
+      const toDate = new Date(data.leave_to_date);
+      return toDate >= fromDate;
+    }
   }, {
-    message: "Return time (in_datetime) must be after out time (out_datetime)",
-    path: ["in_datetime"]
+    message: "Return time/date must be after or on out time/date",
+    path: ["reason"]
+  })
+});
+
+export const createMaintenanceSchema = z.object({
+  body: z.object({
+    issue_type: z.string().min(3, "Issue type must be at least 3 characters").max(100),
+    description: z.string().min(5, "Description must be at least 5 characters").max(1000),
+    priority: z.enum(['low', 'medium', 'high', 'critical']).default('medium')
   })
 });

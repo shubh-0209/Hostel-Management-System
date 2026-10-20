@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import { bedApi } from '../../api/bedApi';
+import { roomApi } from '../../api/roomApi';
 import { allocationService } from '../../api/allocationService';
 import { Button } from '../../components/ui/Button';
 import { ChevronRight, ArrowLeft, Bed, Info, CheckCircle2 } from 'lucide-react';
@@ -13,8 +14,10 @@ export default function StudentRoomDetail() {
   const location = useLocation();
   const { showToast } = useToast();
   
-  // Try to get context from router state, fallback to basic UI if refreshed
-  const { room, floor, hostel } = location.state || {};
+  // Try to get context from router state, fallback to API fetch if refreshed
+  const [room, setRoom] = useState(location.state?.room || null);
+  const [floor, setFloor] = useState(location.state?.floor || null);
+  const [hostel, setHostel] = useState(location.state?.hostel || null);
   
   const [beds, setBeds] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,24 +25,35 @@ export default function StudentRoomDetail() {
   const [confirming, setConfirming] = useState(false);
 
   useEffect(() => {
-    async function loadBeds() {
+    async function loadData() {
       try {
         setLoading(true);
-        const res = await bedApi.getByRoomId(roomId);
-        // Sort beds by bed_number
-        const sortedBeds = (res.data || []).sort((a, b) => a.bed_number - b.bed_number);
+        const bedPromise = bedApi.getByRoomId(roomId);
+        const roomPromise = !room ? roomApi.getById(roomId).catch(() => null) : Promise.resolve(null);
+
+        const [bedRes, roomRes] = await Promise.all([bedPromise, roomPromise]);
+        
+        const sortedBeds = (bedRes.data || []).sort((a, b) => a.bed_number - b.bed_number);
         setBeds(sortedBeds);
+
+        if (roomRes?.data) {
+          const r = roomRes.data;
+          setRoom(r);
+          if (r.floor) setFloor(r.floor);
+          if (r.floor?.hostel) setHostel(r.floor.hostel);
+        }
       } catch (err) {
-        showToast("Failed to load beds", "error");
+        showToast("Failed to load room details", "error");
       } finally {
         setLoading(false);
       }
     }
-    loadBeds();
+    loadData();
   }, [roomId]);
 
+
   const handleBedSelect = (bed) => {
-    if (bed.status !== 'Available') return;
+    if (bed.status?.toLowerCase() !== 'available') return;
     setSelectedBed(bed.id === selectedBed?.id ? null : bed);
   };
 
@@ -47,10 +61,11 @@ export default function StudentRoomDetail() {
     try {
       setConfirming(true);
       await allocationService.allocateBed(selectedBed.id);
-      showToast('Bed allocated successfully!');
+      showToast('Bed allocated successfully!', 'success');
       navigate('/student/allocation');
     } catch (err) {
-      showToast(err.message, 'error');
+      const msg = err.response?.data?.error || err.message || 'Allocation failed';
+      showToast(msg, 'error');
     } finally {
       setConfirming(false);
     }
@@ -67,7 +82,7 @@ export default function StudentRoomDetail() {
 
   // Calculate stats
   const capacity = room?.capacity || beds.length || 0;
-  const occupiedCount = beds.filter(b => b.status === 'Allocated').length;
+  const occupiedCount = beds.filter(b => b.status?.toLowerCase() === 'allocated').length;
 
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-8 animate-in fade-in duration-500 pb-32">
@@ -136,25 +151,31 @@ export default function StudentRoomDetail() {
             {/* Bed Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               {beds.map(bed => {
-                const isAvailable = bed.status === 'Available';
+                const status = (bed.status || '').toLowerCase();
+                const isAvailable = status === 'available';
                 const isSelected = selectedBed?.id === bed.id;
                 
                 // Determine styling based on state
                 let cardStyle = "bg-slate-100 border-slate-200 opacity-60 cursor-not-allowed"; // Default disabled
                 let statusColor = "text-slate-500";
+                let statusLabel = "Unavailable";
                 
-                if (bed.status === 'Allocated') {
+                if (status === 'allocated') {
                   cardStyle = "bg-slate-100 border-slate-200 cursor-not-allowed";
                   statusColor = "text-slate-500";
-                } else if (bed.status === 'Maintenance') {
+                  statusLabel = "Allocated";
+                } else if (status === 'maintenance') {
                   cardStyle = "bg-amber-50 border-amber-200 cursor-not-allowed";
                   statusColor = "text-amber-700";
+                  statusLabel = "Maintenance";
                 } else if (isAvailable && isSelected) {
                   cardStyle = "bg-primary border-primary shadow-md ring-2 ring-primary/20 cursor-pointer transform scale-105 transition-all";
                   statusColor = "text-white";
+                  statusLabel = "Selected";
                 } else if (isAvailable) {
                   cardStyle = "bg-emerald-50 border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 cursor-pointer transition-colors";
                   statusColor = "text-emerald-700";
+                  statusLabel = "Available";
                 }
 
                 return (
@@ -163,7 +184,7 @@ export default function StudentRoomDetail() {
                     disabled={!isAvailable}
                     onClick={() => handleBedSelect(bed)}
                     className={`relative p-6 rounded-xl border flex flex-col items-center justify-center space-y-3 ${cardStyle}`}
-                    aria-label={`Bed ${bed.bed_number}, Status: ${bed.status}`}
+                    aria-label={`Bed ${bed.bed_number}, Status: ${statusLabel}`}
                   >
                     {isSelected && (
                       <div className="absolute -top-2 -right-2 bg-white rounded-full">
@@ -176,7 +197,7 @@ export default function StudentRoomDetail() {
                         Bed {bed.bed_number}
                       </div>
                       <div className={`text-xs font-medium uppercase tracking-wider ${statusColor}`}>
-                        {bed.status}
+                        {statusLabel}
                       </div>
                     </div>
                   </button>

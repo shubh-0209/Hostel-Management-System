@@ -13,23 +13,26 @@ export default function StudentHostels() {
   
   const [search, setSearch] = useState('');
   const [yearFilter, setYearFilter] = useState('');
+  const [error, setError] = useState(null);
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    async function fetchHostels() {
-      try {
-        setLoading(true);
-        const res = await studentService.getHostels();
-        setHostels(res.data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    }
     fetchHostels();
   }, []);
+
+  async function fetchHostels() {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await studentService.getHostels();
+      setHostels(res.data || []);
+    } catch (err) {
+      setError(err.response?.data?.error || err.message || 'Failed to load hostels');
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const filteredHostels = hostels.filter(h => {
     const matchesSearch = h.name.toLowerCase().includes(search.toLowerCase()) || (h.code && h.code.toLowerCase().includes(search.toLowerCase()));
@@ -56,6 +59,13 @@ export default function StudentHostels() {
         title="Find Your Hostel" 
         description="Explore available hostel rooms and choose the accommodation that works best for you."
       />
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700 flex items-center justify-between">
+          <span>{error}</span>
+          <Button size="sm" variant="outline" onClick={fetchHostels}>Retry</Button>
+        </div>
+      )}
 
       {/* Filters */}
       <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row gap-4">
@@ -97,19 +107,23 @@ export default function StudentHostels() {
 
             return (
               <div key={hostel.id} className="bg-white rounded-xl border border-slate-200 shadow-sm hover:border-primary/50 transition-all overflow-hidden flex flex-col group">
-                <div className="h-32 bg-gradient-to-br from-slate-100 to-slate-200 relative p-6 flex items-end">
-                  <div className="absolute top-4 right-4 flex space-x-2">
-                    {isFull ? (
-                      <span className="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-semibold shadow-sm">Full</span>
-                    ) : (
-                      <span className="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-xs font-semibold shadow-sm">Available</span>
-                    )}
-                    <span className="bg-white/80 backdrop-blur-sm text-slate-700 px-2 py-1 rounded text-xs font-semibold shadow-sm">{hostel.type || 'Hostel'}</span>
+                <div className="bg-slate-50 border-b border-slate-100 p-6 flex flex-col justify-between">
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="bg-primary/10 p-2.5 rounded-xl text-primary">
+                      <Building2 className="w-6 h-6" />
+                    </div>
+                    <div className="flex space-x-2">
+                      {isFull ? (
+                        <span className="bg-red-100 text-red-700 px-2.5 py-1 rounded-full text-xs font-semibold">Full</span>
+                      ) : (
+                        <span className="bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full text-xs font-semibold">Available</span>
+                      )}
+                      <span className="bg-white border border-slate-200 text-slate-700 px-2 py-0.5 rounded text-xs font-semibold">{hostel.type || 'Hostel'}</span>
+                    </div>
                   </div>
-                  <Building2 className="w-16 h-16 text-primary/10 absolute -bottom-4 -right-4 transform -rotate-12 group-hover:scale-110 transition-transform" />
                   <div>
-                    <h3 className="text-xl font-bold text-slate-900 drop-shadow-sm">{hostel.name}</h3>
-                    <p className="text-sm font-medium text-slate-600">{hostel.code}</p>
+                    <h3 className="text-xl font-bold text-slate-900">{hostel.name}</h3>
+                    <p className="text-sm font-medium text-slate-500">{hostel.code}</p>
                   </div>
                 </div>
                 

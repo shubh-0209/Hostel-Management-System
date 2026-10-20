@@ -6,5 +6,8 @@ export const outingService = {
   },
   createOuting: async (data) => {
     return apiClient.post('/student/outings', data);
+  },
+  cancelOuting: async (id) => {
+    return apiClient.patch(`/student/outings/${id}/cancel`);
   }
 };

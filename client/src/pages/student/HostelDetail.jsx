@@ -15,15 +15,17 @@ export default function StudentHostelDetail() {
   const [floors, setFloors] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     async function loadData() {
       try {
         setLoading(true);
+        setError(null);
         // Get hostel details from student eligible list
         const allHostelsRes = await studentService.getHostels();
-        const currentHostel = allHostelsRes.data.find(h => h.id === hostelId);
-        if (!currentHostel) throw new Error("Hostel not found or not eligible");
+        const currentHostel = (allHostelsRes.data || []).find(h => h.id === hostelId);
+        if (!currentHostel) throw new Error("Hostel not found or not eligible for your academic year");
         
         setHostel(currentHostel);
 
@@ -32,14 +34,13 @@ export default function StudentHostelDetail() {
         const floorsData = floorsRes.data || [];
         setFloors(floorsData);
 
-        let allRooms = [];
-        for (const floor of floorsData) {
-          const rRes = await roomApi.getByFloorId(floor.id);
-          allRooms = [...allRooms, ...(rRes.data || [])];
-        }
+        const roomResponses = await Promise.all(
+          floorsData.map(floor => roomApi.getByFloorId(floor.id).catch(() => ({ data: [] })))
+        );
+        const allRooms = roomResponses.flatMap(r => r.data || []);
         setRooms(allRooms);
       } catch (err) {
-        console.error(err);
+        setError(err.response?.data?.error || err.message || "Failed to load hostel details");
       } finally {
         setLoading(false);
       }
@@ -60,7 +61,8 @@ export default function StudentHostelDetail() {
     return (
       <div className="max-w-7xl mx-auto p-12 text-center">
         <h2 className="text-2xl font-bold text-slate-900">Hostel Not Found</h2>
-        <Button onClick={() => navigate('/student/hostels')} className="mt-4">
+        <p className="text-sm text-slate-500 mt-2">{error || "This hostel may not be eligible for your academic year."}</p>
+        <Button onClick={() => navigate('/student/hostels')} className="mt-6">
           <ArrowLeft className="w-4 h-4 mr-2" /> Back to Hostels
         </Button>
       </div>
