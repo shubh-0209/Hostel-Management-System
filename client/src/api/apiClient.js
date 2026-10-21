@@ -1,8 +1,12 @@
 import axios from 'axios';
 import { supabase } from '../lib/supabase.js';
 
+const defaultBaseURL = import.meta.env.PROD
+  ? 'https://hms-backend.onrender.com/api/v1'
+  : 'http://localhost:3000/api/v1';
+
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1',
+  baseURL: import.meta.env.VITE_API_URL || defaultBaseURL,
   headers: {
     'Content-Type': 'application/json',
   },
