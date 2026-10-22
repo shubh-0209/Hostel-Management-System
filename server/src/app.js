@@ -8,10 +8,23 @@ import { errorHandler } from './middleware/errorHandler.js';
 
 const app = express();
 
+const allowedOrigins = [
+  env.FRONTEND_URL?.replace(/\/+$/, ''),
+  'https://app-hms.vercel.app',
+  'http://localhost:5173',
+].filter(Boolean);
+
 // Security Middleware
 app.use(helmet());
 app.use(cors({
-  origin: env.FRONTEND_URL,
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    const cleanOrigin = origin.replace(/\/+$/, '');
+    if (allowedOrigins.includes(cleanOrigin) || cleanOrigin.endsWith('.vercel.app')) {
+      return callback(null, true);
+    }
+    return callback(new Error(`Not allowed by CORS: ${origin}`));
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   credentials: true,
 }));

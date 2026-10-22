@@ -1,12 +1,26 @@
 import axios from 'axios';
 import { supabase } from '../lib/supabase.js';
 
-const defaultBaseURL = import.meta.env.PROD
-  ? 'https://hms-backend.onrender.com/api/v1'
-  : 'http://localhost:3000/api/v1';
+const getBaseURL = () => {
+  const envUrl = import.meta.env.VITE_API_URL;
+  const isBrowser = typeof window !== 'undefined';
+  const isLocal = isBrowser
+    ? (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    : !import.meta.env.PROD;
+
+  // On any deployed non-localhost domain, never allow localhost fallback
+  if (!isLocal) {
+    if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
+      return envUrl;
+    }
+    return 'https://hms-backend.onrender.com/api/v1';
+  }
+
+  return envUrl || 'http://localhost:3000/api/v1';
+};
 
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || defaultBaseURL,
+  baseURL: getBaseURL(),
   headers: {
     'Content-Type': 'application/json',
   },
