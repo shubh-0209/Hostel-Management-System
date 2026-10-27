@@ -13,7 +13,7 @@ const getBaseURL = () => {
     if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
       return envUrl;
     }
-    return 'https://hms-backend.onrender.com/api/v1';
+    return 'https://hms-backend-ea83.onrender.com/api/v1';
   }
 
   return envUrl || 'http://localhost:3000/api/v1';
