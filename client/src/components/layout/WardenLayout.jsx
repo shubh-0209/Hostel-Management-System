@@ -10,12 +10,14 @@ import {
   BellRing,
   BarChart3,
   History,
-  Settings
+  Settings,
+  UtensilsCrossed
 } from 'lucide-react';
 
 const wardenNavigation = [
   { name: 'Dashboard', href: '/warden/dashboard', icon: LayoutDashboard },
   { name: 'Hostels', href: '/warden/hostels', icon: Building2 },
+  { name: 'Mess Menu', href: '/warden/mess-menu', icon: UtensilsCrossed },
   { name: 'Allocations & Reports', href: '/warden/occupancy', icon: BarChart3 },
   { name: 'Outings', href: '/warden/outings', icon: CalendarClock },
   { name: 'Maintenance', href: '/warden/maintenance', icon: Settings },

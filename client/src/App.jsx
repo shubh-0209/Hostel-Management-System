@@ -18,6 +18,7 @@ import WardenDashboard from './pages/WardenDashboard';
 import WardenOutings from './pages/warden/Outings';
 import WardenMaintenance from './pages/warden/Maintenance';
 import WardenOccupancyReports from './pages/warden/OccupancyReports';
+import WardenMessMenu from './pages/warden/MessMenu';
 import Placeholder from './pages/Placeholder';
 
 import StudentDashboard from './pages/student/Dashboard';
@@ -25,6 +26,7 @@ import StudentHostels from './pages/student/Hostels';
 import StudentHostelDetail from './pages/student/HostelDetail';
 import StudentRoomDetail from './pages/student/RoomDetail';
 import StudentAllocation from './pages/student/Allocation';
+import StudentMessMenu from './pages/student/MessMenu';
 import StudentProfile from './pages/student/Profile';
 import StudentOutings from './pages/student/Outings';
 import StudentNotifications from './pages/student/Notifications';
@@ -51,6 +53,7 @@ function App() {
                   <Route path="dashboard" element={<WardenDashboard />} />
                   <Route path="hostels" element={<Hostels />} />
                   <Route path="hostels/:hostelId" element={<HostelDetail />} />
+                  <Route path="mess-menu" element={<WardenMessMenu />} />
                   <Route path="students" element={<Placeholder title="Student Directory" />} />
                   <Route path="outings" element={<WardenOutings />} />
                   <Route path="maintenance" element={<WardenMaintenance />} />
@@ -68,6 +71,7 @@ function App() {
                   <Route path="hostels/:hostelId" element={<StudentHostelDetail />} />
                   <Route path="rooms/:roomId" element={<StudentRoomDetail />} />
                   <Route path="allocation" element={<StudentAllocation />} />
+                  <Route path="mess-menu" element={<StudentMessMenu />} />
                   <Route path="profile" element={<StudentProfile />} />
                   <Route path="outings" element={<StudentOutings />} />
                   <Route path="maintenance" element={<StudentMaintenance />} />

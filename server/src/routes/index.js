@@ -6,6 +6,7 @@ import roomRoutes from './rooms.js';
 import bedRoutes from './beds.js';
 import studentRoutes from './student.js';
 import wardenRoutes from './warden.js';
+import messMenuRoutes from './messMenu.js';
 
 const router = Router();
 
@@ -16,5 +17,6 @@ router.use('/rooms', roomRoutes);
 router.use('/beds', bedRoutes);
 router.use('/student', studentRoutes);
 router.use('/warden', wardenRoutes);
+router.use('/mess-menu', messMenuRoutes);
 
 export default router;

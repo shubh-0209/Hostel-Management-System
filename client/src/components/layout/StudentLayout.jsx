@@ -7,7 +7,8 @@ import {
   CalendarClock, 
   UserCircle,
   BellRing,
-  Wrench
+  Wrench,
+  UtensilsCrossed
 } from 'lucide-react';
 
 const studentNavigation = [
@@ -15,6 +16,7 @@ const studentNavigation = [
   { name: 'Profile', href: '/student/profile', icon: UserCircle },
   { name: 'Browse Hostels', href: '/student/hostels', icon: Building2 },
   { name: 'My Allocation', href: '/student/allocation', icon: Bed },
+  { name: 'Mess Menu', href: '/student/mess-menu', icon: UtensilsCrossed },
   { name: 'Out Pass & Leave', href: '/student/outings', icon: CalendarClock },
   { name: 'Maintenance', href: '/student/maintenance', icon: Wrench },
   { name: 'Notifications', href: '/student/notifications', icon: BellRing },
